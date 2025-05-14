@@ -17,6 +17,12 @@ asmbf_exec:
 
 	mov byte [rbp-10], al
 
+	mov rax, SYS_WRITE
+	mov rdi, 1
+	lea rsi, [rbp-10]
+	mov rdx, 2
+	syscall
+
 	; al - current char
 
 	inc qword [rbp-18]
