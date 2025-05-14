@@ -58,18 +58,19 @@ asmbf_exec:
 		jmp .loop_end
 	.op_open:
 		; mov qword [rbp-18-64-8-8], 0 ; loop counter
-		cmp qword [rbp-18-64-8], 0 ; pointer
+		mov rax, qword [rbp-18-64-8] ; pointer
+		cmp byte [rax], 0
 		jne .loop_end
 
 		; current cell is 0, skip that loop
 		mov qword [rbp-18-64-8-8], 2 ; loop counter
 		.op_open_cmp:
-			cmp qword [rbp-18-64-8-8], 1
+			cmp qword [rbp-18-64-8-8], 1 ; loop counter
 			jle .op_open_end
 
-			inc qword [rbp-18]
-			mov rax, qword [rbp-18]
-			mov al, byte [rax]
+			inc qword [rbp-18] ; fp
+			mov rax, qword [rbp-18] ; fp
+			mov al, byte [rax] ; current char
 
 			cmp al, '['
 			je .op_open_inc
@@ -78,16 +79,17 @@ asmbf_exec:
 			jmp .op_open_cmp
 			
 			.op_open_inc:
-				inc qword [rbp-18-64-8-8]
+				inc qword [rbp-18-64-8-8] ; loop counter
 				jmp .op_open_cmp
 			.op_open_dec: 
-				dec qword [rbp-18-64-8-8]
+				dec qword [rbp-18-64-8-8] ; loop counter
 				jmp .op_open_cmp
 
 		.op_open_end:
 		jmp .loop_end
 	.op_close:
-		cmp qword [rbp-18-64-8], 0 ; pointer
+		mov rax, qword [rbp-18-64-8] ; pointer
+		cmp byte [rax], 0
 		je .loop_end
 
 		mov qword [rbp-18-64-8-8], 2 ; loop counter
