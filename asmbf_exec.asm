@@ -8,12 +8,27 @@ asmbf_exec:
 	mov byte [rbp-10], 0 ; temp
 	mov byte [rbp-9], 0 ; temp
 	mov qword [rbp-18], rdi ; fp
-	mov qword [rbp-18-64], 0 ; memory
+	mov qword [rbp-18-ASMBF_MEMORY_SIZE], 0 ; memory
+
+	; fill the memory with zeroes
+	lea rax, qword [rbp-18-ASMBF_MEMORY_SIZE]
+	lea rcx, qword [rbp-18]
+	.clr_cmp:
+		cmp rax, rcx
+		jge .clr_end
+
+		mov byte [rax], 0
+
+		inc rax
+
+		jmp .clr_cmp
+			
+	.clr_end:
 
 	mov rax, rbp
 	sub rax, 18+64
-	mov qword [rbp-18-64-8], rax ; pointer
-	mov qword [rbp-18-64-8-8], 1 ; loop counter
+	mov qword [rbp-18-ASMBF_MEMORY_SIZE-8], rax ; pointer
+	mov qword [rbp-18-ASMBF_MEMORY_SIZE-8-8], 1 ; loop counter
 
 .loop:
 	mov rax, qword [rbp-18]
@@ -43,29 +58,29 @@ asmbf_exec:
 	jmp .loop_end
 
 	.op_inc:
-		mov rax, qword [rbp-18-64-8] ; pointer
+		mov rax, qword [rbp-18-ASMBF_MEMORY_SIZE-8] ; pointer
 		inc byte [rax]
 		jmp .loop_end
 	.op_dec:
-		mov rax, qword [rbp-18-64-8] ; pointer
+		mov rax, qword [rbp-18-ASMBF_MEMORY_SIZE-8] ; pointer
 		dec byte [rax]
 		jmp .loop_end
 	.op_right:
-		inc qword [rbp-18-64-8] ; pointer
+		inc qword [rbp-18-ASMBF_MEMORY_SIZE-8] ; pointer
 		jmp .loop_end
 	.op_left:
-		dec qword [rbp-18-64-8] ; pointer
+		dec qword [rbp-18-ASMBF_MEMORY_SIZE-8] ; pointer
 		jmp .loop_end
 	.op_open:
-		; mov qword [rbp-18-64-8-8], 0 ; loop counter
-		mov rax, qword [rbp-18-64-8] ; pointer
+		; mov qword [rbp-18-ASMBF_MEMORY_SIZE-8-8], 0 ; loop counter
+		mov rax, qword [rbp-18-ASMBF_MEMORY_SIZE-8] ; pointer
 		cmp byte [rax], 0
 		jne .loop_end
 
 		; current cell is 0, skip that loop
-		mov qword [rbp-18-64-8-8], 2 ; loop counter
+		mov qword [rbp-18-ASMBF_MEMORY_SIZE-8-8], 2 ; loop counter
 		.op_open_cmp:
-			cmp qword [rbp-18-64-8-8], 1 ; loop counter
+			cmp qword [rbp-18-ASMBF_MEMORY_SIZE-8-8], 1 ; loop counter
 			jle .op_open_end
 
 			inc qword [rbp-18] ; fp
@@ -79,22 +94,22 @@ asmbf_exec:
 			jmp .op_open_cmp
 			
 			.op_open_inc:
-				inc qword [rbp-18-64-8-8] ; loop counter
+				inc qword [rbp-18-ASMBF_MEMORY_SIZE-8-8] ; loop counter
 				jmp .op_open_cmp
 			.op_open_dec: 
-				dec qword [rbp-18-64-8-8] ; loop counter
+				dec qword [rbp-18-ASMBF_MEMORY_SIZE-8-8] ; loop counter
 				jmp .op_open_cmp
 
 		.op_open_end:
 		jmp .loop_end
 	.op_close:
-		mov rax, qword [rbp-18-64-8] ; pointer
+		mov rax, qword [rbp-18-ASMBF_MEMORY_SIZE-8] ; pointer
 		cmp byte [rax], 0
 		je .loop_end
 
-		mov qword [rbp-18-64-8-8], 2 ; loop counter
+		mov qword [rbp-18-ASMBF_MEMORY_SIZE-8-8], 2 ; loop counter
 		.op_close_cmp:
-			cmp qword [rbp-18-64-8-8], 1
+			cmp qword [rbp-18-ASMBF_MEMORY_SIZE-8-8], 1
 			jle .op_close_end
 
 			dec qword [rbp-18]
@@ -108,16 +123,16 @@ asmbf_exec:
 			jmp .op_close_cmp
 			
 			.op_close_inc:
-				inc qword [rbp-18-64-8-8]
+				inc qword [rbp-18-ASMBF_MEMORY_SIZE-8-8]
 				jmp .op_close_cmp
 			.op_close_dec: 
-				dec qword [rbp-18-64-8-8]
+				dec qword [rbp-18-ASMBF_MEMORY_SIZE-8-8]
 				jmp .op_close_cmp
 
 		.op_close_end:
 		jmp .loop_end
 	.op_out:
-		mov rax, qword [rbp-18-64-8] ; pointer
+		mov rax, qword [rbp-18-ASMBF_MEMORY_SIZE-8] ; pointer
 		mov al, byte [rax]
 
 		mov byte [rbp-10], al
