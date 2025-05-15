@@ -1,5 +1,5 @@
 ; (char*) rdi - filename
-asmbf_easyexec:
+asmbf_dofile:
 	push rbp
 	mov rbp, rsp
 	sub rsp, 32

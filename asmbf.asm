@@ -4,7 +4,7 @@ entry _start
 
 include 'consts.inc'
 include 'asmbf_exec.asm'
-include 'asmbf_easyexec.asm'
+include 'asmbf_dofile.asm'
 
 quit_noarg:
 	mov rax, SYS_WRITE
@@ -24,7 +24,7 @@ _start:
 	je quit_noarg
 
 	mov [filename], rdi
-	call asmbf_easyexec
+	call asmbf_dofile
 
 	jmp quit
 
