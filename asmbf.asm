@@ -6,6 +6,14 @@ include 'consts.inc'
 include 'asmbf_exec.asm'
 include 'asmbf_dofile.asm'
 
+quit_read:
+	mov rax, SYS_WRITE
+	mov rdi, 1
+	mov rsi, readerr
+	mov rdx, readerr_len
+	syscall
+	jmp quit
+
 quit_noarg:
 	mov rax, SYS_WRITE
 	mov rdi, 1
@@ -26,10 +34,13 @@ _start:
 	mov [filename], rdi
 	call asmbf_dofile
 
+
 	jmp quit
 
 noarg: db "usage: asmbf [filename]", 10, 0
 noarg_len = $-noarg
+readerr: db "read fail", 10, 0
+readerr_len = $-readerr
 filename: dq 1
 ;fd: rd 1
 ;stat: rb SIZEOF_STAT

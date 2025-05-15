@@ -20,7 +20,7 @@ asmbf_dofile:
 
 	; exit if failed to read
 	cmp rax, -1
-	je .quit
+	je .quit_read
 
 	mov qword [rbp-8-8], rax ; fd
 
@@ -50,7 +50,7 @@ asmbf_dofile:
 
 	; quit if failed
 	cmp rax, MAP_FAILED
-	je .quit
+	je .quit_mmap
 
 	mov qword [rbp-8-8-8-8], rax ; buf
 
@@ -69,6 +69,12 @@ asmbf_dofile:
 	mov rdi, qword [rbp-8-8] ; fd
 	syscall
 
+.quit_mmap:
+	mov rax, DOFILE_MMAP
+	jmp .quit
+.quit_read:
+	mov rax, DOFILE_READ
+	jmp .quit
 .quit:
 	add rsp, 32
 	add rsp, SIZEOF_STAT
