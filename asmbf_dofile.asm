@@ -37,6 +37,12 @@ asmbf_dofile:
 	mov rax, [rax]
 	mov qword [rbp-8-8-8], rax ; filesize
 
+	; check if the filesize == 0
+	; because we will crash later
+	; do not ask how
+	cmp rax, 0
+	je .quit_invalid_size
+
 	; allocate the buffer for the file
 	; mmap(NULL, filesize, PROT_READ|PROT_WRITE, MAP_PRIVATE, fd, 0);
 	mov rax, SYS_MMAP
@@ -69,6 +75,11 @@ asmbf_dofile:
 	mov rdi, qword [rbp-8-8] ; fd
 	syscall
 
+	jmp .quit
+
+.quit_invalid_size:
+	mov rax, DOFILE_SIZE
+	jmp .quit
 .quit_mmap:
 	mov rax, DOFILE_MMAP
 	jmp .quit
